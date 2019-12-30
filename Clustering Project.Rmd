@@ -1,0 +1,61 @@
+---
+title: "Clustering"
+author: "Sean F. Larsen"
+date: "December 28, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("cluster")
+library("rattle.data")
+library("NbClust")
+```
+
+## Clustering
+This project is based on the K-Means exercise from 'R in Action'
+For the original blog post and solutions go to  
+<http://www.r-bloggers.com/k-means-clustering-from-r-in-action/>
+
+I will be using the cluster, rattle.data, and NbClust packages.
+I will also be usinging the Wine Data set from the rattle.data package.
+This code will pull the data and show me the column heads for further analysis.
+
+```{r echo=FALSE}
+data(wine, package="rattle.data")
+head(wine)
+```
+For this exercise I will remove the first column from the data
+and the scale the data.
+
+```{r echo=FALSE}
+wine$Type <- NULL
+head(wine)
+wine.scale <- scale(wine, center = TRUE, scale = TRUE)
+```
+
+Now we are going to cluster and plot the data to determine the number of clusters.
+
+```{r echo=FALSE}
+set.seed(1234)
+nc <- NbClust(wine.scale, min.nc=2, max.nc=15, method="kmeans")
+barplot(table(nc$Best.n[1,]),
+	          xlab="Numer of Clusters", ylab="Number of Criteria",
+		            main="Number of Clusters Chosen by 26 Criteria")
+```
+
+Based on the results I am going to select 14 clusters.
+
+## Run the K-Means and Plot
+Now that I have picked the number of clusters, I'm running k-means 
+using this number of clusters. This code will output the result of calling kmeans()
+into a variable fit.km
+Then we will plot the data.
+
+```{r echo=FALSE}
+fit.km <- kmeans(wine.scale, 14, iter.max = 10, nstart = 1)
+table(fit.km$cluster)
+clusplot(wine.scale, fit.km$cluster)
+```
+
+
